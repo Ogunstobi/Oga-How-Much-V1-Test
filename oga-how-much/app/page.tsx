@@ -16,6 +16,37 @@ function parseAmount(value: string) {
   return Number(value.replace(/,/g, ""));
 }
 
+const ogaGreeResponses = [
+  { threshold: 5, text: "Small win, but no wahala — the bargain still sweet." },
+  { threshold: 10, text: "Nice one, you chopped a little off and still got the deal moving." },
+  { threshold: 15, text: "That’s a fair bargain. Oga gree, and the savings still look good." },
+  { threshold: 20, text: "Sharp move! You saved a decent amount and still closed confidently." },
+  { threshold: 25, text: "This one strong! You negotiate like a boss and the price is looking better." },
+  { threshold: 30, text: "Very nice! Oga gree with style — that discount is proper." },
+  { threshold: 35, text: "Big respect! You squeezed out a serious bargain without stress." },
+  { threshold: 40, text: "This is a clean win. Oga gree, and your savings are getting juicy." },
+  { threshold: 50, text: "Boss move! You nearly knocked it down by half. That’s a legendary deal." },
+  { threshold: Infinity, text: "Pure negotiation magic! Oga gree full vibes — you saved big and still landed it." },
+];
+
+const ogaNoGreeResponses = [
+  { threshold: 5, text: "No gree this time, but the offer is still respectful and smart." },
+  { threshold: 10, text: "Seller no gree, but you still made a fair, bold move." },
+  { threshold: 15, text: "No gree today, yet you still put up a respectable bargain." },
+  { threshold: 20, text: "No deal this round, but that was a strong negotiation attempt." },
+  { threshold: 25, text: "Oga no gree, but your offer was serious and well thought out." },
+  { threshold: 30, text: "No gree this time, but you were very close and still negotiating well." },
+  { threshold: 35, text: "The seller no gree, but you still showed strong bargaining energy." },
+  { threshold: 40, text: "No gree for now, but that’s a very solid offer and a smart push." },
+  { threshold: 50, text: "Oga no gree, but your bargain was strong enough to make them think twice." },
+  { threshold: Infinity, text: "No gree this time, but your numbers were serious — try a little more push and you’ll land it." },
+];
+
+function getBargainResponse(percentageOff: number, status: "accepted" | "rejected") {
+  const responses = status === "accepted" ? ogaGreeResponses : ogaNoGreeResponses;
+  return responses.find((response) => percentageOff <= response.threshold)?.text ?? responses[responses.length - 1].text;
+}
+
 export default function Home() {
   const [askingPrice, setAskingPrice] = useState("");
   const [buyerPrice, setBuyerPrice] = useState("");
@@ -137,9 +168,9 @@ export default function Home() {
             {result.difference === 0
               ? "No bargaining today 😂 Same price, no wahala."
               : dealStatus === "accepted"
-                ? "🎉 DEAL! Oga gree! Na your price you pay."
+                ? `🎉 ${getBargainResponse(result.percentageOff, "accepted")}`
                 : dealStatus === "rejected"
-                  ? "Oga no gree 😂 Try another price?"
+                  ? `💪 ${getBargainResponse(result.percentageOff, "rejected")}`
                   : result.percentageOff >= 30
                     ? "Omooo, you wan collect am almost half price 😂"
                     : result.percentageOff >= 15
